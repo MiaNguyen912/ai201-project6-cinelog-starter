@@ -10,8 +10,9 @@ This file is my written record of the code review. It documents what I changed, 
 - **How I verified:** I did a project-wide search for `save_to_watchlist` to ensure there's no usage of the old function's name that hasn't been updated. I also compare the changes with VSCode Git tool to see the differences I made before committing the change. This help me verify no out-of-scope issue was touched
 
 ## Comment 2 — Deduplication
-**What I did:**
-**How I verified:**
+- **Detail**: `add_to_watchlist()` in `services/watchlist_service.py` doesn't check if a film already existed in watchlist. If a user calls this with a film that's already on their watchlist, the current implementation would add a duplicate entry -> Need to add deduplication logic. (follow the same pattern in `add_to_collection()` in `services/collection_service.py`)
+- **What I did:** Added a deduplication check to `add_to_watchlist()` following the same pattern as `add_to_collection()`. I also defined a new `AlreadyInWatchlistError` exception class directly in `watchlist_service.py` rather than reusing `AlreadyInCollectionError` from `collection_service.py`. This keeps the two services independent and ensures the error name and message accurately reflect the watchlist domain.
+- **How I verified:** I reviewed the updated file to confirm the deduplication query, the new exception class, and the corrected error message are all in place.
 
 ## Comment 3 — Missing test
 **What I did:**
