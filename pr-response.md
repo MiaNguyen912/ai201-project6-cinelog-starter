@@ -15,8 +15,11 @@ This file is my written record of the code review. It documents what I changed, 
 - **How I verified:** I reviewed the updated file to confirm the deduplication query, the new exception class, and the corrected error message are all in place.
 
 ## Comment 3 — Missing test
-**What I did:**
-**How I verified:**
+- **Detail**: add a test for the case where `film_id` doesn't exist in the database for the `add_to_watchlist()` feature, following the pattern in `test_add_to_collection_nonexistent_film_raises` from `tests/test_collection.py`.
+- **What I did:** Added `test_add_to_watchlist_nonexistent_film_raises` to `tests/test_watchlist.py`, following the same structure as `test_add_to_collection_nonexistent_film_raises`. The test uses a fake UUID that doesn't exist in the in-memory test database and asserts that `FilmNotFoundError` is raised by `add_to_watchlist()`.
+- **How I verified:** 
+    - I reviewed the test to confirm it mirrors the pattern from `test_collection.py`, same fixture setup and assertion structure.
+    - I ran `pytest tests/test_watchlist.py -v` and confirmed the test passed
 
 ## Comment 4 — Default visibility
 **My position:**
