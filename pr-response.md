@@ -32,9 +32,12 @@ This file is my written record of the code review. It documents what I changed, 
 
 
 ## Comment 5 — Sort order
-**My position:**
-**Reasoning:**
-**Engagement with reviewer's point:**
+- **Detail**: the reviewer prefers watchlists to default to "date added" order rather than alphabetical since most users want to see what they added recently. They want me to document my reasoning for my design decision
+- **My position:** I am keeping the alphabetical sort (`Film.title ASC`). The maintainer's preference is reasonable, but I think it fits a feed better than a planning list.
+- **Reasoning:** 
+    - A watchlist is something users consult when deciding what to watch, so they'd scan it like a menu instead of scrolling  like a timeline. Alphabetical order makes it easy to find a specific title without remembering when they saved it. 
+    - I see that the collection feature sorts by `date_added DESC`, but this is because it is a log of past activity where recency is meaningful. A watchlist shouldn't follow the same design since it has different semantics: all films in list are unfinished, so the order that makes it most browsable is more useful than the order that reflects how it was built.
+**Engagement with reviewer's point:** The maintainer argues that "most users want to see what they added recently". That framing treats the watchlist as a feed of saves, where freshness signals relevance. That is a fair model if users add films impulsively and want to act on the most recent impulse first. But it also means a film added six months ago drifts to the bottom and may never surface again. Alphabetical keeps every title equally visible regardless of when it was saved, which better matches the "pick something to watch tonight" use case.
 
 ## Comment 6 — Rebase
 **What conflicted:**
