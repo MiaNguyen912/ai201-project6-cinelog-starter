@@ -22,9 +22,14 @@ This file is my written record of the code review. It documents what I changed, 
     - I ran `pytest tests/test_watchlist.py -v` and confirmed the test passed
 
 ## Comment 4 — Default visibility
-**My position:**
-**Reasoning:**
-**Tradeoff acknowledged:**
+- **Detail**: the reviewer noticed watchlists default to `public=True`. Since we don't have a documented decision on default visibility for user lists, before they can approve this, they need me to add a note to my PR description explaining my reasoning to  make sure I'm being intentional, not just inheriting a default.
+- **Define the scope of issue:** the reviewer mentioned watchlists is default to `public=True`. However, when i did a project-wide search for the keyword `public=True`, I didn't see any result returned -> To look for the code associated with this issue, I had to find how a watchlist is initialized -> In `models.py` where the class `WatchlistEntry` is defined, i see `public = db.Column(db.Boolean, default=True)` -> This is where watchlist instances is defaulted to be public
+- **My position:** I am keeping `public=True` as the default. It is an intentional design choice, not an inherited accident.
+- **Reasoning:**
+    - In `models.py`, the `public` field exists on `WatchlistEntry` but not on `CollectionEntry`. This visibility control difference is on purpose to allow `WatchlistEntry` to be set as public by default.
+    - Even when `WatchlistEntry` is a personal watch-later list of films, it can be used for social sharing and discovery as users can browse their friends' watchlists and get film recommendations. Defaulting to `public=True` matches that intent and makes the social feature useful without requiring users to actively opt in.
+- **Tradeoff acknowledged:** A `public=True` default means users who don't notice the setting have their watchlist exposed. The safer pattern for any user data is private-by-default and `CollectionEntry` implicitly follows that by having no `public` field at all. 
+
 
 ## Comment 5 — Sort order
 **My position:**
