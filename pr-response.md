@@ -2,7 +2,12 @@
 This file is my written record of the code review. It documents what I changed, why, and my reasoning for the two design decisions.
 
 ## AI Usage
-<!-- Fill in at the end — how you used AI tools during this project -->
+
+**1. Rebase process (Comment 6)**
+I used Claude to run `git fetch origin` and `git rebase origin/main` first so I could see what would happen — what conflicts came up, why they occurred, and how to resolve them. Claude explained that the UUID-migration commit on `main` (`07ca580`) had deleted `WatchlistEntry` from `models.py` entirely, which is why the visibility commit couldn't find the class to edit. Once I understood the root cause and the resolution steps, I aborted the rebase Claude had done and repeated the process myself manually.
+
+**2. Stress-testing the sort order argument (Comment 5)**
+I had already written my position (keep alphabetical) before asking the AI. I gave it the reviewer's counterargument — "most users want to see what they added recently" — and asked it to push back on my reasoning as hard as it could. The AI's strongest point was that a `date_added DESC` sort surfaces the most recent addition first, which is useful if a user adds a film because they just heard about it and want to act on that impulse quickly. I acknowledged this in my final response ("that framing treats the watchlist as a feed of saves, where freshness signals relevance") but held my position: alphabetical keeps every title equally visible over time, which better fits the "pick something to watch tonight" use case. The AI's challenge sharpened the tradeoff I described rather than changing my conclusion.
 
 ## Comment 1 — Rename
 - **Detail**: `save_to_watchlist()` in `services/watchlist_service.py` should follow the project's naming convention. Compare with `add_to_collection()` - the pattern here is verb_to_noun -> rename to `add_to_watchlist()` and update all call sites.
@@ -115,4 +120,22 @@ ec90edb added watchlist model and endpoint fixed a bug more changes
 ```
 
 ## PR Description
-<!-- Written at the end — feature overview, design decisions, manual testing steps -->
+
+Adds a watchlist feature so users can save films to watch later.
+
+**Endpoints:**
+- `GET /watchlist/<user_id>` — view a user's watchlist
+- `POST /watchlist/<user_id>/add` — add a film (`{"film_id": "<id>"}`)
+
+Handles duplicates (`AlreadyInWatchlistError`) and nonexistent films (`FilmNotFoundError`).
+
+**Design decisions:**
+- **Visibility defaults to `public=True`** — watchlists are social by intent; users should be able to browse friends' lists for recommendations without having to opt in.
+- **Sorted alphabetically (`Film.title ASC`)** — a watchlist is a planning list, not a feed. Alphabetical order makes it easy to scan for a specific title regardless of when it was added.
+
+**Manual testing:**
+1. Start the server: `python app.py`
+2. Add a film to a watchlist: `POST /watchlist/<user_id>/add` with `{"film_id": "<id>"}`
+3. View the watchlist: `GET /watchlist/<user_id>` — confirm films appear alphabetically
+4. Add the same film again — confirm duplicate is rejected
+5. Add with a fake film id — confirm `FilmNotFoundError` is returned
