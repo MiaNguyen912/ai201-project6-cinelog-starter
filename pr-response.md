@@ -40,9 +40,61 @@ This file is my written record of the code review. It documents what I changed, 
 **Engagement with reviewer's point:** The maintainer argues that "most users want to see what they added recently". That framing treats the watchlist as a feed of saves, where freshness signals relevance. That is a fair model if users add films impulsively and want to act on the most recent impulse first. But it also means a film added six months ago drifts to the bottom and may never surface again. Alphabetical keeps every title equally visible regardless of when it was saved, which better matches the "pick something to watch tonight" use case.
 
 ## Comment 6 — Rebase
+**Commands run:**
+```bash
+git fetch origin
+git rebase origin/main
+```
+
 **What conflicted:**
+
+Two files conflicted during the 8-commit rebase:
+
+1. **`.gitignore` (add/add conflict)** — commit `4f38cdc` (rename fix) brought a `.gitignore` that didn't include `.pytest_cache/`, while `origin/main` had added that entry via the "chore: add .gitignore" commit (`718a9a8`). Git flagged both sides as independently adding the file.
+
+2. **`models.py` (content conflict)** — commit `07b8ffb` (change `WatchlistEntry.public` default to `False`) tried to edit the `WatchlistEntry` class, but `WatchlistEntry` no longer existed in the rebase's working tree at that point. The root cause: the UUID-migration commit on `main` (`07ca580` — "refactor: migrate film IDs from integer to UUID") deleted `WatchlistEntry` from `models.py` entirely when it migrated Film IDs. So by the time `07b8ffb` tried to touch that class, it had been wiped by the base-branch change.
+
 **How I resolved it:**
+
+1. **`.gitignore`** — Kept all entries from both sides: retained `.pytest_cache/` (from `origin/main`) plus `.venv/` and `venv/` (from the branch). This is a pure union merge — both sets of ignores are correct and non-overlapping.
+
+2. **`models.py`** — Accepted the `WatchlistEntry` class in full as introduced by `07b8ffb` (with `public = db.Column(db.Boolean, default=False)`). The class had to be re-added because `origin/main`'s UUID migration deleted it. The intent of the commit — changing the default visibility — was preserved exactly. The subsequent commit `3e8b516` then applied cleanly on top and reverted the default back to `True` as intended.
+
 **How I verified no conflict remains:**
+
+- `git rebase --continue` completed all 8 commits without further errors, finishing with: `Successfully rebased and updated refs/heads/feature/watchlist.`
+- Ran `grep -rn "<<<<<<"` across all `.py`, `.md`, and `.gitignore` files — no conflict markers found.
+- Final log shows a clean linear history of 8 commits on top of `bbe206c` (origin/main tip) with no merge commits.
+- `git log --oneline --merges origin/main..HEAD` shows no output, which means zero merge commits. The flag --merges filters to only merge commits; empty result confirms your branch history is clean.
+    - A merge commit: is a special commit git creates when you join 2 branches together with git merge. It has two parent commits instead of one, and looks like this in the log:
+    ```
+    *   bbe206c Merge pull request #2 from ascherj/chore/add-gitignore
+    |\  
+    | * 718a9a8 chore: add .gitignore for generated files
+    |/  
+    * 07ca580 refactor: migrate film IDs from integer to UUID
+    ```
+    - Why rebasing avoids them: Instead of merging main into your branch, git rebase replays your commits one by one on top of the new base. The result is a straight line with no forks — every commit has exactly one parent. That's what your branch looks like now:
+    ```
+    * bd3af08 fix: add reasoning for watchlist's sort order
+    * c22c088 fix: change position on the default visibility of watchlist
+    * ...
+    * bbe206c Merge pull request #2 (← origin/main tip)
+    ```
+    => A clean linear history is easier to read and review
+
+- I can also visually confirm with the graph show when running `git log --oneline --graph origin/main..HEAD`  (See how many commits are on our branch relative to main)
+    ```
+    * bd3af08 (HEAD -> feature/watchlist) fix: add reasoning for watchlist's sort order
+    * c22c088 fix: change position on the default visibility of watchlist
+    * 9a9ea6d fix: change WatchlistEntry's public to False by default and add supporting reasoning
+    * 34a9985 fix: add a new test_watchlist.py file with test case test_add_to_watchlist_nonexistent_film_raises
+    * 032e05b fix: add deduplication logic to add_to_watchlist()
+    * 7214421 fix: rename 'save_to_watchlist()' to 'add_to_watchlist()' to follow the naming convention
+    * f95ecde fix: update film retrieval method to use db.session.get in collection and watchlist services
+    * 51f358d added watchlist model and endpoint fixed a bug more changes
+    ```
+    Every line starts with * (a regular commit) — no |\  or |\ fork lines that indicate a merge commit. All 8 commits are in a straight line on top of origin/main.
 
 ## PR Description
 <!-- Written at the end — feature overview, design decisions, manual testing steps -->
