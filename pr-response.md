@@ -96,5 +96,23 @@ Two files conflicted during the 8-commit rebase:
     ```
     Every line starts with * (a regular commit) — no |\  or |\ fork lines that indicate a merge commit. All 8 commits are in a straight line on top of origin/main.
 
+## git log --oneline
+
+![git log --oneline](git%20logs.png)
+
+```
+787951d (HEAD -> feature/watchlist) fix: update pr-response.md with documentation of the 'git rebase' process
+e4fdc21 fix: update pr-response.md to add reasoning for watchlist's sort order decision
+5eb44cc fix: update pr-response.md with default visibility decision for watchlist
+67e78d1 test: add test for nonexistent film_id in add_to_watchlist
+4f0df8b fix: add deduplication logic to add_to_watchlist() to prevent duplicate watchlist entries
+dee2712 fix: rename 'save_to_watchlist()' to 'add_to_watchlist()' to follow the naming convention
+75477cb feat: add .gitignore for generated files
+4bb5181 fix: update WatchlistEntry film_id to UUID after main branch refactor
+7c37bcd (origin/feature/watchlist) fix: update film retrieval method to use db.session.get in collection and watchlist services
+ec90edb added watchlist model and endpoint fixed a bug more changes
+014ae54 feat: initial CineLog API with film collection feature
+```
+
 ## PR Description
 <!-- Written at the end — feature overview, design decisions, manual testing steps -->
