@@ -106,16 +106,19 @@ Two files conflicted during the 8-commit rebase:
 ![git log --oneline](git%20logs.png)
 
 ```
-787951d (HEAD -> feature/watchlist) fix: update pr-response.md with documentation of the 'git rebase' process
-e4fdc21 fix: update pr-response.md to add reasoning for watchlist's sort order decision
-5eb44cc fix: update pr-response.md with default visibility decision for watchlist
-67e78d1 test: add test for nonexistent film_id in add_to_watchlist
-4f0df8b fix: add deduplication logic to add_to_watchlist() to prevent duplicate watchlist entries
-dee2712 fix: rename 'save_to_watchlist()' to 'add_to_watchlist()' to follow the naming convention
-75477cb feat: add .gitignore for generated files
-4bb5181 fix: update WatchlistEntry film_id to UUID after main branch refactor
-7c37bcd (origin/feature/watchlist) fix: update film retrieval method to use db.session.get in collection and watchlist services
-ec90edb added watchlist model and endpoint fixed a bug more changes
+e4cd052 (HEAD -> feature/watchlist, origin/feature/watchlist) fix: update pr-response.md
+7d38aba fix: update pr-response.md with git log --oneline result
+f0cd285 fix: update pr-response.md with documentation of the 'git rebase' process
+0d4d921 fix: update pr-response.md to add reasoning for watchlist's sort order decision
+54055b3 fix: update pr-response.md with default visibility decision for watchlist
+9b7f4a9 test: add test for nonexistent film_id in add_to_watchlist
+cf99d97 fix: add deduplication logic to add_to_watchlist() to prevent duplicate watchlist entries
+116cda8 fix: rename 'save_to_watchlist()' to 'add_to_watchlist()' to follow the naming convention
+7419a27 fix: update film retrieval method to use db.session.get in collection and watchlist services
+a33507b feat: add watchlist model and add_to_watchlist endpoint
+bbe206c (origin/main, origin/HEAD, main) Merge pull request #2 from ascherj/chore/add-gitignore
+718a9a8 chore: add .gitignore for generated files
+07ca580 refactor: migrate film IDs from integer to UUID
 014ae54 feat: initial CineLog API with film collection feature
 ```
 
